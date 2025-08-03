@@ -1,0 +1,992 @@
+[
+    {
+        "id": "c657a5d5df0ad142",
+        "type": "tab",
+        "label": "Tesla",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "45643a9c95ac7a2e",
+        "type": "inject",
+        "z": "c657a5d5df0ad142",
+        "name": "Set Tessie Token",
+        "props": [],
+        "repeat": "86400",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 160,
+        "y": 120,
+        "wires": [
+            [
+                "4004389a37b55857"
+            ]
+        ]
+    },
+    {
+        "id": "4004389a37b55857",
+        "type": "function",
+        "z": "c657a5d5df0ad142",
+        "name": "Set Global Token",
+        "func": "global.set(\"tessie_token\", \"Bearer <token>");\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e7e8ccad6a9a2238",
+        "type": "inject",
+        "z": "c657a5d5df0ad142",
+        "name": "Get VIN",
+        "props": [],
+        "repeat": "600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 150,
+        "y": 180,
+        "wires": [
+            [
+                "0cda79dd9e96eb73"
+            ]
+        ]
+    },
+    {
+        "id": "0cda79dd9e96eb73",
+        "type": "function",
+        "z": "c657a5d5df0ad142",
+        "name": "Prepare Vehicle Request",
+        "func": "let token = global.get(\"tessie_token\");\nmsg.headers = {\n    Authorization: token\n};\nmsg.url = \"https://api.tessie.com/vehicles\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 180,
+        "wires": [
+            [
+                "b6a6d2f052987f16"
+            ]
+        ]
+    },
+    {
+        "id": "b6a6d2f052987f16",
+        "type": "http request",
+        "z": "c657a5d5df0ad142",
+        "name": "Tessie API - Vehicles",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 630,
+        "y": 180,
+        "wires": [
+            [
+                "e6de2b2376c19c7a"
+            ]
+        ]
+    },
+    {
+        "id": "e6de2b2376c19c7a",
+        "type": "function",
+        "z": "c657a5d5df0ad142",
+        "name": "Store Vehicle ID",
+        "func": "let vin = msg.payload.results[0].vin;\nglobal.set(\"vin\", vin);\nmsg.payload = vin;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 180,
+        "wires": [
+            [
+                "b9af10fd38f478a8"
+            ]
+        ]
+    },
+    {
+        "id": "b9af10fd38f478a8",
+        "type": "debug",
+        "z": "c657a5d5df0ad142",
+        "name": "Vin",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1050,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "a70ba7f1ea876af2",
+        "type": "inject",
+        "z": "c657a5d5df0ad142",
+        "name": "Get Tesla SoC",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 160,
+        "y": 260,
+        "wires": [
+            [
+                "2b55446f1b955887"
+            ]
+        ]
+    },
+    {
+        "id": "2b55446f1b955887",
+        "type": "function",
+        "z": "c657a5d5df0ad142",
+        "name": "Prepare SoC Request",
+        "func": "let token = global.get(\"tessie_token\");\nlet vin = global.get(\"vin\");\n\nmsg.headers = {\n    Authorization: token\n};\nmsg.url = `https://api.tessie.com/${vin}/battery`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 260,
+        "wires": [
+            [
+                "657acbb3fdc9b5de"
+            ]
+        ]
+    },
+    {
+        "id": "657acbb3fdc9b5de",
+        "type": "http request",
+        "z": "c657a5d5df0ad142",
+        "name": "Tessie API - SoC",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 630,
+        "y": 260,
+        "wires": [
+            [
+                "65206ffaf0d69ddd"
+            ]
+        ]
+    },
+    {
+        "id": "65206ffaf0d69ddd",
+        "type": "function",
+        "z": "c657a5d5df0ad142",
+        "name": "Extract SoC",
+        "func": "let soc = msg.payload.battery_level;\nglobal.set(\"soc\", soc);\nmsg.payload=soc;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 850,
+        "y": 260,
+        "wires": [
+            [
+                "baa2794440466522"
+            ]
+        ]
+    },
+    {
+        "id": "baa2794440466522",
+        "type": "debug",
+        "z": "c657a5d5df0ad142",
+        "name": "Battery SoC",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1060,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "inject_get_location",
+        "type": "inject",
+        "z": "c657a5d5df0ad142",
+        "name": "Get Tesla Location",
+        "props": [],
+        "repeat": "5",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 160,
+        "y": 340,
+        "wires": [
+            [
+                "function_prepare_location_request"
+            ]
+        ]
+    },
+    {
+        "id": "function_prepare_location_request",
+        "type": "function",
+        "z": "c657a5d5df0ad142",
+        "name": "Prepare Location Request",
+        "func": "let token = global.get(\"tessie_token\");\nlet vin = global.get(\"vin\");\n\nmsg.headers = {\n    Authorization: token\n};\nmsg.url = `https://api.tessie.com/${vin}/location`;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 390,
+        "y": 340,
+        "wires": [
+            [
+                "http_location"
+            ]
+        ]
+    },
+    {
+        "id": "http_location",
+        "type": "http request",
+        "z": "c657a5d5df0ad142",
+        "name": "Tessie API - Location",
+        "method": "GET",
+        "ret": "obj",
+        "url": "",
+        "headers": [],
+        "x": 600,
+        "y": 320,
+        "wires": [
+            [
+                "function_extract_location",
+                "debug_location"
+            ]
+        ]
+    },
+    {
+        "id": "function_extract_location",
+        "type": "function",
+        "z": "c657a5d5df0ad142",
+        "name": "Extract & Store Location",
+        "func": "let location = msg.payload.saved_location;\nglobal.set(\"tesla_location\", location);\nmsg.payload = location;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 870,
+        "y": 340,
+        "wires": [
+            [
+                "debug_location"
+            ]
+        ]
+    },
+    {
+        "id": "debug_location",
+        "type": "debug",
+        "z": "c657a5d5df0ad142",
+        "name": "Tesla Location",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1090,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "inject_check_plugged",
+        "type": "inject",
+        "z": "c657a5d5df0ad142",
+        "name": "Check Plugged In (from /vehicles)",
+        "props": [],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": ".1",
+        "topic": "",
+        "x": 180,
+        "y": 420,
+        "wires": [
+            [
+                "function_prepare_vehicle_request"
+            ]
+        ]
+    },
+    {
+        "id": "function_prepare_vehicle_request",
+        "type": "function",
+        "z": "c657a5d5df0ad142",
+        "name": "Prepare Vehicle Request",
+        "func": "let token = global.get(\"tessie_token\");\nmsg.headers = {\n    Authorization: token\n};\nmsg.url = \"https://api.tessie.com/vehicles\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 420,
+        "wires": [
+            [
+                "http_vehicle_request"
+            ]
+        ]
+    },
+    {
+        "id": "http_vehicle_request",
+        "type": "http request",
+        "z": "c657a5d5df0ad142",
+        "name": "Tessie API - Vehicles",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 680,
+        "y": 420,
+        "wires": [
+            [
+                "function_extract_plugged_state",
+                "debug_plugged_state"
+            ]
+        ]
+    },
+    {
+        "id": "function_extract_plugged_state",
+        "type": "function",
+        "z": "c657a5d5df0ad142",
+        "name": "Extract Plugged In",
+        "func": "let vehicle = msg.payload.results[0];\nlet charge = vehicle.last_state.charge_state;\n\nlet plugged = charge.conn_charge_cable !== null && charge.conn_charge_cable !== \"Disconnected\" && charge.charge_port_latch === \"Engaged\";\n\nmsg.payload = {\n    plugged_in: plugged,\n    conn_charge_cable: charge.conn_charge_cable,\n    charge_port_latch: charge.charge_port_latch,\n    charging_state: charge.charging_state\n};\n\nglobal.set(\"tesla_plugged_in\", plugged);\nglobal.set(\"tesla_charging_state\", charge.charging_state);\nglobal.set(\"tesla_charge_amps\", charge.charge_amps);\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 900,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "debug_plugged_state",
+        "type": "debug",
+        "z": "c657a5d5df0ad142",
+        "name": "Plugged In Info",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "a31f3fdd602c959a",
+        "type": "victron-input-temperature",
+        "z": "c657a5d5df0ad142",
+        "service": "com.victronenergy.temperature/24",
+        "path": "/Temperature",
+        "serviceObj": {
+            "service": "com.victronenergy.temperature/24",
+            "name": "Generic Temperature Input"
+        },
+        "pathObj": {
+            "path": "/Temperature",
+            "type": "float",
+            "name": "Temperature (°C)"
+        },
+        "name": "",
+        "onlyChanges": false,
+        "roundValues": "1",
+        "x": 250,
+        "y": 1020,
+        "wires": [
+            [
+                "ac57a5f1456971f7"
+            ]
+        ]
+    },
+    {
+        "id": "8266fe7da549aabc",
+        "type": "victron-input-solarcharger",
+        "z": "c657a5d5df0ad142",
+        "service": "com.victronenergy.solarcharger/277",
+        "path": "/Yield/Power",
+        "serviceObj": {
+            "service": "com.victronenergy.solarcharger/277",
+            "name": "Sur"
+        },
+        "pathObj": {
+            "path": "/Yield/Power",
+            "type": "float",
+            "name": "PV Power (W)"
+        },
+        "name": "",
+        "onlyChanges": false,
+        "roundValues": "1",
+        "x": 170,
+        "y": 580,
+        "wires": [
+            [
+                "ac57a5f1456971f7"
+            ]
+        ]
+    },
+    {
+        "id": "9e351b0b2b03e91d",
+        "type": "victron-input-solarcharger",
+        "z": "c657a5d5df0ad142",
+        "service": "com.victronenergy.solarcharger/278",
+        "path": "/Yield/Power",
+        "serviceObj": {
+            "service": "com.victronenergy.solarcharger/278",
+            "name": "Ost"
+        },
+        "pathObj": {
+            "path": "/Yield/Power",
+            "type": "float",
+            "name": "PV Power (W)"
+        },
+        "name": "",
+        "onlyChanges": false,
+        "roundValues": "1",
+        "x": 170,
+        "y": 640,
+        "wires": [
+            [
+                "ac57a5f1456971f7"
+            ]
+        ]
+    },
+    {
+        "id": "5512fb7e288a5dd5",
+        "type": "victron-input-solarcharger",
+        "z": "c657a5d5df0ad142",
+        "service": "com.victronenergy.solarcharger/288",
+        "path": "/Yield/Power",
+        "serviceObj": {
+            "service": "com.victronenergy.solarcharger/288",
+            "name": "Casita"
+        },
+        "pathObj": {
+            "path": "/Yield/Power",
+            "type": "float",
+            "name": "PV Power (W)"
+        },
+        "name": "",
+        "onlyChanges": false,
+        "roundValues": "1",
+        "x": 180,
+        "y": 700,
+        "wires": [
+            [
+                "ac57a5f1456971f7"
+            ]
+        ]
+    },
+    {
+        "id": "d4c60a6e05c62376",
+        "type": "victron-input-solarcharger",
+        "z": "c657a5d5df0ad142",
+        "service": "com.victronenergy.solarcharger/289",
+        "path": "/Yield/Power",
+        "serviceObj": {
+            "service": "com.victronenergy.solarcharger/289",
+            "name": "Jardin"
+        },
+        "pathObj": {
+            "path": "/Yield/Power",
+            "type": "float",
+            "name": "PV Power (W)"
+        },
+        "name": "",
+        "onlyChanges": false,
+        "roundValues": "1",
+        "x": 180,
+        "y": 760,
+        "wires": [
+            [
+                "ac57a5f1456971f7"
+            ]
+        ]
+    },
+    {
+        "id": "59a2ef59e7f1bea0",
+        "type": "victron-input-system",
+        "z": "c657a5d5df0ad142",
+        "service": "com.victronenergy.system/0",
+        "path": "/Ac/Consumption/L1/Power",
+        "serviceObj": {
+            "service": "com.victronenergy.system/0",
+            "name": "Venus system"
+        },
+        "pathObj": {
+            "path": "/Ac/Consumption/L1/Power",
+            "type": "float",
+            "name": "AC Consumption L1 (W)"
+        },
+        "name": "",
+        "onlyChanges": false,
+        "roundValues": "0",
+        "x": 230,
+        "y": 840,
+        "wires": [
+            [
+                "ac57a5f1456971f7"
+            ]
+        ]
+    },
+    {
+        "id": "37b9a2c5fadcd3f2",
+        "type": "victron-input-system",
+        "z": "c657a5d5df0ad142",
+        "service": "com.victronenergy.system/0",
+        "path": "/Ac/Consumption/L2/Power",
+        "serviceObj": {
+            "service": "com.victronenergy.system/0",
+            "name": "Venus system"
+        },
+        "pathObj": {
+            "path": "/Ac/Consumption/L2/Power",
+            "type": "float",
+            "name": "AC Consumption L2 (W)"
+        },
+        "name": "",
+        "onlyChanges": false,
+        "x": 230,
+        "y": 900,
+        "wires": [
+            [
+                "ac57a5f1456971f7"
+            ]
+        ]
+    },
+    {
+        "id": "3ecce92e30a72248",
+        "type": "victron-input-system",
+        "z": "c657a5d5df0ad142",
+        "service": "com.victronenergy.system/0",
+        "path": "/Ac/Consumption/L3/Power",
+        "serviceObj": {
+            "service": "com.victronenergy.system/0",
+            "name": "Venus system"
+        },
+        "pathObj": {
+            "path": "/Ac/Consumption/L3/Power",
+            "type": "float",
+            "name": "AC Consumption L3 (W)"
+        },
+        "name": "",
+        "onlyChanges": false,
+        "x": 230,
+        "y": 960,
+        "wires": [
+            [
+                "ac57a5f1456971f7"
+            ]
+        ]
+    },
+    {
+        "id": "ac57a5f1456971f7",
+        "type": "join",
+        "z": "c657a5d5df0ad142",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "8",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 550,
+        "y": 900,
+        "wires": [
+            [
+                "047d79bda254b819"
+            ]
+        ]
+    },
+    {
+        "id": "b11f6e5dc668f6a4",
+        "type": "debug",
+        "z": "c657a5d5df0ad142",
+        "name": "debug 17",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1080,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "3ffdc6ee3203c981",
+        "type": "function",
+        "z": "c657a5d5df0ad142",
+        "name": "Calculate charging",
+        "func": "let location = global.get(\"tesla_location\");\nlet plugged = global.get(\"tesla_plugged_in\");\nlet charging_state = global.get(\"tesla_charging_state\");\nlet charge_amps = global.get(\"tesla_charge_amps\");\nlet simulationvalue=0\nlet data = msg.payload;\nlet maxPower = 2400;\nlet temperature = data[\"Generic Temperature Input - Temperature (°C)\"];\nlet l1 = data[\"Venus system - AC Consumption L1 (W)\"];\nlet l2 = data[\"Venus system - AC Consumption L2 (W)\"];\nlet l3 = data[\"Venus system - AC Consumption L3 (W)\"];\n\n// Snížení výkonu o 10 %, pokud je teplota nad 40 °C\nif (temperature > 40) {\n    maxPower *= 0.9;\n}\n\nlet maxPhaseConsumption = Math.max(l1, l2, l3);\nlet remainingPower = maxPower - maxPhaseConsumption;\n\nlet m1 = data[\"Ost - PV Power (W)\"];\nlet m2 = data[\"Casita - PV Power (W)\"];\nlet m3 = data[\"Jardin - PV Power (W)\"];\nlet m4 = data[\"Sur - PV Power (W)\"];\nlet solar = m1 + m2 + m3 + m4;\n\nlet currentTeslaChargingPower = 0;\n\n// Pokud uz nabijim dostupny vykon je vyssi o to, co uz nabiji\nif (charging_state === \"Charging\") {\n    currentTeslaChargingPower = charge_amps * 230;\n}\n\n\nlet amps=0 \n// amps je promenna kterakde je vysledek vypoctu pozadovaneho nabijeciho proudu\n// zatimco charge_amps je akcualni nabijeci proud, pokud se nabiji\n\n//Tohle je logika na vypocet volne kapacity\nlet AvailablePower=Math.min(remainingPower + currentTeslaChargingPower,solar / 3 *.9 + simulationvalue)\nif (AvailablePower>300) \n{ \n    amps = Math.floor(AvailablePower / 230); \n    if (amps<5) {amps=amps-1;}\n}\nelse\n{ amps=0}\n\n\nlet chargingOn = false; //chargingOn je signal na spousteni nebo vypina nabijeni\nif (location === \"Home\") {\n    if (plugged === true && amps > 0) {\n        chargingOn = true;\n    }\n    else\n    {\n           chargingOn = false;\n    }\n}\n\n\nmsg.payload = {\n    temperature: temperature,\n    maxPowerAdjusted: maxPower,\n    maxPhaseConsumption: maxPhaseConsumption,\n    remainingPower: remainingPower,\n    AvailablePower: AvailablePower,\n    ampsCalculated: amps,\n    solarTotal: solar,\n    chargeAmps: amps,\n    location: location,\n    plugged: plugged,\n    charging_state: charging_state,\n    currentTeslaChargingPower: currentTeslaChargingPower,\n    chargingOn: chargingOn\n};\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 870,
+        "y": 900,
+        "wires": [
+            [
+                "b11f6e5dc668f6a4",
+                "79c6864724b5e9d4",
+                "ef362f344f73ade2",
+                "09a4b18c1f5712ef"
+            ]
+        ]
+    },
+    {
+        "id": "dd8d63431ea86b85",
+        "type": "http request",
+        "z": "c657a5d5df0ad142",
+        "name": "Tessie API - Set Charging Amps",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 830,
+        "y": 1200,
+        "wires": [
+            [
+                "94e42e724716fb39"
+            ]
+        ]
+    },
+    {
+        "id": "d8e15248133fa3f4",
+        "type": "http request",
+        "z": "c657a5d5df0ad142",
+        "name": "Tessie API - Start Charging",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 820,
+        "y": 1240,
+        "wires": [
+            [
+                "1896bbee081d1321"
+            ]
+        ]
+    },
+    {
+        "id": "dc6da5a65da214e1",
+        "type": "http request",
+        "z": "c657a5d5df0ad142",
+        "name": "Tessie API - Stop Charging",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 820,
+        "y": 1280,
+        "wires": [
+            [
+                "4d95a46de2dd2a79"
+            ]
+        ]
+    },
+    {
+        "id": "79c6864724b5e9d4",
+        "type": "function",
+        "z": "c657a5d5df0ad142",
+        "name": "Prepare Set Amps request",
+        "func": "\n\nif (msg.payload.location !== \"Home\" || msg.payload.plugged !== true || msg.payload.chargingOn==false) {\n    return null; // nepokračuj, pokud nejsme doma nebo není připojeno\n}\n\n\nlet token = global.get(\"tessie_token\");\nlet vin = global.get(\"vin\");\nlet amps =  msg.payload.chargeAmps;\n\nmsg.headers = {\n    Authorization: `${token}`\n   \n};\n\nmsg.url = `https://api.tessie.com/${vin}/command/set_charging_amps?amps=${amps}`;\n\nmsg.payload = {\n    \n    ampsCalculated: msg.payload.chargeAmps,\n    chargingOn: msg.payload.chargingOn\n};\n\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 1200,
+        "wires": [
+            [
+                "263b43d00d2b6ccf"
+            ]
+        ]
+    },
+    {
+        "id": "94e42e724716fb39",
+        "type": "debug",
+        "z": "c657a5d5df0ad142",
+        "name": "debug 19",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1060,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "ef362f344f73ade2",
+        "type": "function",
+        "z": "c657a5d5df0ad142",
+        "name": "Prepare Start Charge request",
+        "func": "\n\nif (msg.payload.location !== \"Home\" || msg.payload.plugged !== true || msg.payload.chargingOn==false || msg.payload.chargeAmps<2) {\n    return null; // nepokračuj, pokud nejsme doma nebo není připojeno\n}\n\n\n\n\nlet token = global.get(\"tessie_token\");\nlet vin = global.get(\"vin\");\n\n\nmsg.headers = {\n    Authorization: `${token}`\n   \n};\n\nmsg.url = `https://api.tessie.com/${vin}/command/start_charging`;\n\n\nmsg.payload = {\n    \n    ampsCalculated: msg.payload.chargeAmps,\n    chargingOn: msg.payload.chargingOn,\n    charging_state: msg.payload.charging_state\n};\n\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 1240,
+        "wires": [
+            [
+                "66b80d6bf062d5fe",
+                "9ada480fa49212da"
+            ]
+        ]
+    },
+    {
+        "id": "09a4b18c1f5712ef",
+        "type": "function",
+        "z": "c657a5d5df0ad142",
+        "name": "Prepare Stop Charge request",
+        "func": "\n\nif (msg.payload.location !== \"Home\" || msg.payload.plugged !== true \n|| msg.payload.chargingOn==true || msg.payload.plugged !== true \n|| msg.payload.charging_state==\"Stopped\") {\n    return null; \n}\n\n\nlet token = global.get(\"tessie_token\");\nlet vin = global.get(\"vin\");\n\n\nmsg.headers = {\n    Authorization: `${token}`\n   \n};\n\nmsg.url = `https://api.tessie.com/${vin}/command/stop_charging`\n\nmsg.payload = {\n    \n    ampsCalculated: msg.payload.chargeAmps,\n    chargingOn: msg.payload.chargingOn,\n    charging_state: msg.payload.charging_state\n};\n\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 1280,
+        "wires": [
+            [
+                "98e5451de65ec917"
+            ]
+        ]
+    },
+    {
+        "id": "1896bbee081d1321",
+        "type": "debug",
+        "z": "c657a5d5df0ad142",
+        "name": "debug 20",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1060,
+        "y": 1240,
+        "wires": []
+    },
+    {
+        "id": "4d95a46de2dd2a79",
+        "type": "debug",
+        "z": "c657a5d5df0ad142",
+        "name": "debug 21",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1060,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "263b43d00d2b6ccf",
+        "type": "rbe",
+        "z": "c657a5d5df0ad142",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 610,
+        "y": 1200,
+        "wires": [
+            [
+                "dd8d63431ea86b85"
+            ]
+        ]
+    },
+    {
+        "id": "9ada480fa49212da",
+        "type": "debug",
+        "z": "c657a5d5df0ad142",
+        "name": "debug 22",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 680,
+        "y": 1460,
+        "wires": []
+    },
+    {
+        "id": "66b80d6bf062d5fe",
+        "type": "rbe",
+        "z": "c657a5d5df0ad142",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 610,
+        "y": 1240,
+        "wires": [
+            [
+                "d8e15248133fa3f4"
+            ]
+        ]
+    },
+    {
+        "id": "98e5451de65ec917",
+        "type": "rbe",
+        "z": "c657a5d5df0ad142",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 610,
+        "y": 1280,
+        "wires": [
+            [
+                "dc6da5a65da214e1"
+            ]
+        ]
+    },
+    {
+        "id": "047d79bda254b819",
+        "type": "delay",
+        "z": "c657a5d5df0ad142",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 680,
+        "y": 900,
+        "wires": [
+            [
+                "3ffdc6ee3203c981"
+            ]
+        ]
+    }
+]
