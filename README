@@ -1,0 +1,7 @@
+This is my prototype of Nodered app for managing tesla charging without smart wallbox.
+it runs on Cerbo GX, and conencts to your Tesla to srart and stop charging and set the charging amps based on your actual solar power considering other consumption in the house.
+
+The solution is developed for my home FVE that consists of 3-phase system with 3x Multiplus II 3000 in ESS mode.
+The first version uses Tessie API. and you need to get an auth token via https://dash.tessie.com/settings/api. You generate token there and then use it in the flow.
+
+
